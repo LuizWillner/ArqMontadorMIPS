@@ -64,7 +64,7 @@ def generate_register_dict(file_name):
 
     for i in range(0, file_size, REGISTER_SIZE):
         register = load_register_from_file(reg_set_file)
-        register_set_dict[register.num] = register
+        register_set_dict[register.name] = register
 
     reg_set_file.close()
 
