@@ -44,11 +44,11 @@ while inst_name.upper() != 'FIM':
 all_instructions.sort(key=sort_by_instruction_key)
 
 # Escrever conteúdo da lista num arquivo binário
-file = open(FILE_NAME, 'wb')
+file = open(ALL_INSTS_FILE_NAME, 'wb')
 for instruction in all_instructions:
     instruction.save_in_file(file)
 file.close()
 
 # Printar conteúdo do arquivo binário gerado
 print()
-print_instruction_file(FILE_NAME)
+print_instruction_file(ALL_INSTS_FILE_NAME)

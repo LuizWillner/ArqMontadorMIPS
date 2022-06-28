@@ -11,7 +11,7 @@ INST_TYPE_SIZE = 1
 OPCODE_SIZE = 1
 INST_FUNCT_SIZE = 1
 INSTRUCTION_SIZE = KEY_SIZE + NAME_SIZE + INST_TYPE_SIZE + OPCODE_SIZE + INST_FUNCT_SIZE
-FILE_NAME = 'instruction_set.bin'
+ALL_INSTS_FILE_NAME = 'instruction_set.bin'
 
 
 # ======================= CLASSES ==============================
@@ -111,10 +111,10 @@ def load_instruction_from_file(file):
     return Instruction(picked_name, picked_type, picked_opcode, picked_funct, picked_key)
 
 
-def print_instruction_file(nome):
-    print(f'=================== ARQUIVO: {nome} ===================')
-    file = open(nome, 'rb')
-    file_size = os.path.getsize(nome)
+def print_instruction_file(file_name):
+    print(f'=================== ARQUIVO: {file_name} ===================')
+    file = open(file_name, 'rb')
+    file_size = os.path.getsize(file_name)
     for i in range(0, file_size, INSTRUCTION_SIZE):
         instruction = load_instruction_from_file(file)
         instruction.print_instruction()
@@ -129,7 +129,7 @@ def generate_instruction_dict(file_name):
 
     for i in range(0, file_size, INSTRUCTION_SIZE):
         instruction = load_instruction_from_file(inst_set_file)
-        instruction_set_dict[instruction.key] = instruction.name
+        instruction_set_dict[instruction.key] = instruction
 
     inst_set_file.close()
 
