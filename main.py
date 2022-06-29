@@ -48,6 +48,8 @@ instruction_set_dict = generate_instruction_dict(ALL_INSTS_FILE_NAME)
 # Gerar tabela do conjunto de Registradores
 register_set_dict = generate_register_dict(ALL_REGS_FILE_NAME)
 
+print_instruction_file(ALL_INSTS_FILE_NAME)
+
 all_bitfield_lists = []
 
 print("Bem vindo ao Assembler MIPS!")
@@ -85,33 +87,72 @@ else:
 
 instruction = instruction_set_dict[generate_key(inst_field)]
 print('Instrução =', instruction.name)
-opcode_binstring = int_to_binarystring(instruction.opcode, 6)
-print('Opcode em binario =', opcode_binstring)
-command_bin = opcode_binstring + ' '
+command_bin = int_to_binarystring(instruction.opcode, 6)
+print('Opcode em binario =', command_bin)
 
 # formatar command_bin para tipo R
 if instruction.type == 'R':
     i += 1
-
+    instR_dict = dict({
+        'rs': None,
+        'rt': None,
+        'rd': None,
+        'shamt': None,
+        'funct': None
+    })
     # Caso especial do tipo R: instruções SLL e SRL
     if instruction.name == 'SLL' or instruction.name == 'SRL':
+        rd = bitfield_list[i]
+        register_d = register_set_dict[rd.lower()]
+        # print('Registrador = ' + register_d.name)
+        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+        # print('Num do registrador em binário:', instR_dict['rd'])
+
+        rs = bitfield_list[i+1]
+        register_s = register_set_dict[rs.lower()]
+        # print('Registrador = ' + register_s.name)
+        instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
+        # print('Num do registrador em binário:', instR_dict['rs'])
+
+        instR_dict['rt'] = '00000'
+
+        shamt = int(bitfield_list[i+2])
+        # print('SHAMT =', shamt)
+        instR_dict['shamt'] = int_to_binarystring(shamt, 5)
+        # print('SHAMT em binário:', instR_dict['shamt'])
+
+        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
+
+    # Caso especial do tipo R: instrução JR
+    elif instruction.name == "JR":
         pass
 
     # Se não for um caso especial
     else:
-        while i < len(bitfield_list):
-            # Se o item da lista analisado começar com $, este item se trata de um REGISTRADOR
-            if bitfield_list[i][0] == '$':
-                register = register_set_dict[bitfield_list[i].lower()]
-                print('Registrador = ' + register.name)
-                regnum_binstring = int_to_binarystring(register.num, 5)
-                print('Num do registrador em binário:', regnum_binstring)
-                command_bin = command_bin + regnum_binstring + ' '  # adicionando campos dos registradores a cada iteração
+        rd = bitfield_list[i]
+        register_d = register_set_dict[rd.lower()]
+        # print('Registrador = ' + register_d.name)
+        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+        # print('Num do registrador em binário:', instR_dict['rd'])
 
-            i += 1
-        command_bin = command_bin + '00000' + ' '  # adicionando campo do shift ammount
-        funct_binstring = int_to_binarystring(instruction.funct, 6)
-        command_bin = command_bin + funct_binstring  # adicionando campo do funct
+        rs = bitfield_list[i+1]
+        register_s = register_set_dict[rs.lower()]
+        # print('Registrador = ' + register_s.name)
+        instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
+        # print('Num do registrador em binário:', instR_dict['rs'])
+
+        rt = bitfield_list[i+2]
+        register_t = register_set_dict[rt.lower()]
+        # print('Registrador = ' + register_t.name)
+        instR_dict['rt'] = int_to_binarystring(register_t.num, 5)
+        # print('Num do registrador em binário:', instR_dict['rt'])
+
+        instR_dict['shamt'] = '00000'
+
+        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
+
+    # Gerando comando em binário do tipo R final seguindo a ordem: opcode - rs - rt - rd - shamt - funct
+    command_bin = command_bin + ' ' + instR_dict['rs'] + ' ' + instR_dict['rt'] + ' ' + instR_dict['rd'] + ' ' + instR_dict['shamt'] + ' ' + instR_dict['funct']
 
 
 # formatar command_bin para tipo I
