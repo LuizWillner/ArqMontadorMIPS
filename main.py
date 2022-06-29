@@ -126,6 +126,7 @@ if instruction.type == 'R':
 
     # Caso especial do tipo R: instrução JR
     elif instruction.name == "JR":
+        # TODO: [processar]
         pass
 
     # Se não for um caso especial
@@ -164,7 +165,7 @@ elif instruction.type == 'I':
         'offset': None
     })
 
-    # [processar]
+    # TODO: [processar]
 
     # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
     command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
@@ -176,7 +177,7 @@ else:
         'address': None
     })
 
-    # processar
+    # TODO: processar
 
     # Gerando comando em binário do tipo J final seguindo a ordem: opcode - address
     command_bin = command_bin + ' ' + instJ_dict['address']
