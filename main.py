@@ -75,7 +75,7 @@ for line in asm_file:
 for i in range(len(all_bitfield_lists)):
     print(all_bitfield_lists[i])
 
-
+# Gerar comando em binário para a linha bitfield_list
 bitfield_list = all_bitfield_lists[0]
 
 i = 0
@@ -89,10 +89,10 @@ instruction = instruction_set_dict[generate_key(inst_field)]
 print('Instrução =', instruction.name)
 command_bin = int_to_binarystring(instruction.opcode, 6)
 print('Opcode em binario =', command_bin)
+i += 1
 
 # formatar command_bin para tipo R
 if instruction.type == 'R':
-    i += 1
     instR_dict = dict({
         'rs': None,
         'rt': None,
@@ -100,6 +100,7 @@ if instruction.type == 'R':
         'shamt': None,
         'funct': None
     })
+
     # Caso especial do tipo R: instruções SLL e SRL
     if instruction.name == 'SLL' or instruction.name == 'SRL':
         rd = bitfield_list[i]
@@ -157,11 +158,28 @@ if instruction.type == 'R':
 
 # formatar command_bin para tipo I
 elif instruction.type == 'I':
-    pass
+    instI_dict = dict({
+        'rs': None,
+        'rt': None,
+        'offset': None
+    })
+
+    # [processar]
+
+    # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
+    command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
+
 
 # formatar command_bin para tipo J
 else:
-    pass
+    instJ_dict = dict({
+        'address': None
+    })
+
+    # processar
+
+    # Gerando comando em binário do tipo J final seguindo a ordem: opcode - address
+    command_bin = command_bin + ' ' + instJ_dict['address']
 
 
 print('comando binário final =', command_bin)
