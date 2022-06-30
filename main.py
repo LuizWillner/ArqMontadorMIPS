@@ -87,7 +87,7 @@ for i in range(len(all_bitfield_lists)):
     print(all_bitfield_lists[i])
 
 # Gerar comando em binário para a linha bitfield_list
-bitfield_list = all_bitfield_lists[7]
+bitfield_list = all_bitfield_lists[10]
 
 i = 0
 if ':' in bitfield_list[i]:
@@ -120,7 +120,7 @@ if instruction.type == 'R':
         instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
         # print('Num do registrador em binário:', instR_dict['rd'])
 
-        rs = bitfield_list[i+1]
+        rs = bitfield_list[i + 1]
         register_s = register_set_dict[rs.lower()]
         # print('Registrador = ' + register_s.name)
         instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
@@ -128,7 +128,7 @@ if instruction.type == 'R':
 
         instR_dict['rt'] = '00000'
 
-        shamt = int(bitfield_list[i+2])
+        shamt = int(bitfield_list[i + 2])
         # print('SHAMT =', shamt)
         instR_dict['shamt'] = int_to_binarystring(shamt, 5)
         # print('SHAMT em binário:', instR_dict['shamt'])
@@ -155,13 +155,13 @@ if instruction.type == 'R':
         instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
         # print('Num do registrador em binário:', instR_dict['rd'])
 
-        rs = bitfield_list[i+1]
+        rs = bitfield_list[i + 1]
         register_s = register_set_dict[rs.lower()]
         # print('Registrador = ' + register_s.name)
         instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
         # print('Num do registrador em binário:', instR_dict['rs'])
 
-        rt = bitfield_list[i+2]
+        rt = bitfield_list[i + 2]
         register_t = register_set_dict[rt.lower()]
         # print('Registrador = ' + register_t.name)
         instR_dict['rt'] = int_to_binarystring(register_t.num, 5)
@@ -183,20 +183,40 @@ elif instruction.type == 'I':
         'offset': None
     })
 
-    rs = bitfield_list[i]
-    register_s = register_set_dict[rs.lower()]
-    print('Registrador = ' + register_s.name)
-    instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
-    print('Num do registrador em binário:', instI_dict['rs'])
+    # Caso especial do tipo I: instruções BEQ e BNE
+    if instruction.name == 'BEQ' or instruction.name == 'BNE':
+        rs = bitfield_list[i]
+        register_s = register_set_dict[rs.lower()]
+        print('Registrador = ' + register_s.name)
+        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+        print('Num do registrador em binário:', instI_dict['rs'])
 
-    rt = bitfield_list[i+1]
-    register_t = register_set_dict[rt.lower()]
-    print('Registrador = ' + register_t.name)
-    instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
-    print('Num do registrador em binário:', instI_dict['rt'])
+        rt = bitfield_list[i + 1]
+        register_t = register_set_dict[rt.lower()]
+        print('Registrador = ' + register_t.name)
+        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+        print('Num do registrador em binário:', instI_dict['rt'])
 
-    offset = int(bitfield_list[i+2])
-    instI_dict['offset'] = int_to_binarystring(offset, 16)
+        flag = bitfield_list[i + 2]
+        offset = flags_in_file[flag]
+        instI_dict['offset'] = int_to_binarystring(offset, 16)
+
+
+    else:
+        rs = bitfield_list[i]
+        register_s = register_set_dict[rs.lower()]
+        print('Registrador = ' + register_s.name)
+        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+        print('Num do registrador em binário:', instI_dict['rs'])
+
+        rt = bitfield_list[i + 1]
+        register_t = register_set_dict[rt.lower()]
+        print('Registrador = ' + register_t.name)
+        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+        print('Num do registrador em binário:', instI_dict['rt'])
+
+        offset = int(bitfield_list[i + 2])
+        instI_dict['offset'] = int_to_binarystring(offset, 16)
 
     # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
     command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
