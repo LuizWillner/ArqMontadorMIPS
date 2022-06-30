@@ -137,8 +137,15 @@ if instruction.type == 'R':
 
     # Caso especial do tipo R: instrução JR
     elif instruction.name == "JR":
-        # TODO: [processar]
-        pass
+        rd = bitfield_list[i]  # nome do registrador
+        register_d = register_set_dict[rd.lower()]  # objeto registrador
+        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+
+        instR_dict['rs'] = '00000'
+        instR_dict['rt'] = '00000'
+        instR_dict['shamt'] = '00000'
+
+        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
 
     # Se não for um caso especial
     else:
