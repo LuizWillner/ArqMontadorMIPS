@@ -17,6 +17,8 @@ def generate_bitfield_list(command_line):
     command_line = command_line.upper()
     command_line = command_line.replace(',', ' ')
     command_line = command_line.replace('\n', '')
+    command_line = command_line.replace('(', ' ')
+    command_line = command_line.replace(')', '')
 
     bitfield_list = command_line.split()
     return bitfield_list
@@ -87,7 +89,7 @@ for i in range(len(all_bitfield_lists)):
     print(all_bitfield_lists[i])
 
 # Gerar comando em binário para a linha bitfield_list
-bitfield_list = all_bitfield_lists[10]
+bitfield_list = all_bitfield_lists[12]
 
 i = 0
 if ':' in bitfield_list[i]:
@@ -201,6 +203,22 @@ elif instruction.type == 'I':
         offset = flags_in_file[flag]
         instI_dict['offset'] = int_to_binarystring(offset, 16)
 
+    elif instruction.name == 'LW' or instruction.name == 'SW':
+        rt = bitfield_list[i]
+        register_t = register_set_dict[rt.lower()]
+        print('Registrador = ' + register_t.name)
+        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+        print('Num do registrador em binário:', instI_dict['rt'])
+
+        offset = int(bitfield_list[i + 1])
+        instI_dict['offset'] = int_to_binarystring(offset, 16)
+
+        rs = bitfield_list[i + 2]
+        register_s = register_set_dict[rs.lower()]
+        print('Registrador = ' + register_s.name)
+        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+        print('Num do registrador em binário:', instI_dict['rs'])
+
 
     else:
         rs = bitfield_list[i]
@@ -228,7 +246,9 @@ else:
         'address': None
     })
 
-    # TODO: processar
+    flag = bitfield_list[i]
+    address = flags_in_file[flag]
+    instJ_dict['address'] = int_to_binarystring(address, 16)
 
     # Gerando comando em binário do tipo J final seguindo a ordem: opcode - address
     command_bin = command_bin + ' ' + instJ_dict['address']
