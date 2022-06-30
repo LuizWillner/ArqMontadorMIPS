@@ -8,6 +8,7 @@ import ctypes
 # ======================== CONSTANTS =============================
 
 asm_file_name = 'exemplo'
+flags_in_file = dict({})
 
 
 # ======================== FUNCTIONS =============================
@@ -47,6 +48,7 @@ instruction_set_dict = generate_instruction_dict(ALL_INSTS_FILE_NAME)
 
 # Gerar tabela do conjunto de Registradores
 register_set_dict = generate_register_dict(ALL_REGS_FILE_NAME)
+print_register_file('register_set.bin')
 
 print_instruction_file(ALL_INSTS_FILE_NAME)
 
@@ -68,15 +70,24 @@ if code_flag != 1 and code_flag != 2:
     exit(1)
 
 # Gerar matriz com listas de bitfields
-for line in asm_file:
+line = asm_file.readline()
+while line:
     line_list = generate_bitfield_list(line)
+    if ':' in line_list[0]:  # se tiver ':', é uma flag, então...
+        # Adicionar flag no dicionario de flags junto com sua posição no arquivo
+        flag_name = line_list[0].replace(':', '')
+        flag_pos = asm_file.tell()
+        flags_in_file[flag_name] = flag_pos
     all_bitfield_lists.append(line_list)
+    line = asm_file.readline()  # passar pra próxima linha
+
+print(flags_in_file)
 
 for i in range(len(all_bitfield_lists)):
     print(all_bitfield_lists[i])
 
 # Gerar comando em binário para a linha bitfield_list
-bitfield_list = all_bitfield_lists[0]
+bitfield_list = all_bitfield_lists[7]
 
 i = 0
 if ':' in bitfield_list[i]:
@@ -165,7 +176,20 @@ elif instruction.type == 'I':
         'offset': None
     })
 
-    # TODO: [processar]
+    rs = bitfield_list[i]
+    register_s = register_set_dict[rs.lower()]
+    print('Registrador = ' + register_s.name)
+    instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+    print('Num do registrador em binário:', instI_dict['rs'])
+
+    rt = bitfield_list[i+1]
+    register_t = register_set_dict[rt.lower()]
+    print('Registrador = ' + register_t.name)
+    instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+    print('Num do registrador em binário:', instI_dict['rt'])
+
+    offset = int(bitfield_list[i+2])
+    instI_dict['offset'] = int_to_binarystring(offset, 16)
 
     # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
     command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
