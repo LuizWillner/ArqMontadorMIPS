@@ -89,171 +89,173 @@ for i in range(len(all_bitfield_lists)):
     print(all_bitfield_lists[i])
 
 # Gerar comando em binário para a linha bitfield_list
-bitfield_list = all_bitfield_lists[12]
 
-i = 0
-if ':' in bitfield_list[i]:
+for bitfield_list in all_bitfield_lists:
+    i = 0
+
+    if ':' in bitfield_list[i]:
+        i += 1
+        inst_field = bitfield_list[i]
+    else:
+        inst_field = bitfield_list[i]
+
+    instruction = instruction_set_dict[generate_key(inst_field)]
+    # ('Instrução =', instruction.name)
+    command_bin = int_to_binarystring(instruction.opcode, 6)
+    # print('Opcode em binario =', command_bin)
+
     i += 1
-    inst_field = bitfield_list[i]
-else:
-    inst_field = bitfield_list[i]
 
-instruction = instruction_set_dict[generate_key(inst_field)]
-print('Instrução =', instruction.name)
-command_bin = int_to_binarystring(instruction.opcode, 6)
-print('Opcode em binario =', command_bin)
-i += 1
 
-# formatar command_bin para tipo R
-if instruction.type == 'R':
-    instR_dict = dict({
-        'rs': None,
-        'rt': None,
-        'rd': None,
-        'shamt': None,
-        'funct': None
-    })
+    # formatar command_bin para tipo R
+    if instruction.type == 'R':
+        instR_dict = dict({
+            'rs': None,
+            'rt': None,
+            'rd': None,
+            'shamt': None,
+            'funct': None
+        })
 
-    # Caso especial do tipo R: instruções SLL e SRL
-    if instruction.name == 'SLL' or instruction.name == 'SRL':
-        rd = bitfield_list[i]
-        register_d = register_set_dict[rd.lower()]
-        # print('Registrador = ' + register_d.name)
-        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
-        # print('Num do registrador em binário:', instR_dict['rd'])
+        # Caso especial do tipo R: instruções SLL e SRL
+        if instruction.name == 'SLL' or instruction.name == 'SRL':
+            rd = bitfield_list[i]
+            register_d = register_set_dict[rd.lower()]
+            # print('Registrador = ' + register_d.name)
+            instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+            # print('Num do registrador em binário:', instR_dict['rd'])
 
-        rs = bitfield_list[i + 1]
-        register_s = register_set_dict[rs.lower()]
-        # print('Registrador = ' + register_s.name)
-        instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
-        # print('Num do registrador em binário:', instR_dict['rs'])
+            rs = bitfield_list[i + 1]
+            register_s = register_set_dict[rs.lower()]
+            # print('Registrador = ' + register_s.name)
+            instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
+            # print('Num do registrador em binário:', instR_dict['rs'])
 
-        instR_dict['rt'] = '00000'
+            instR_dict['rt'] = '00000'
 
-        shamt = int(bitfield_list[i + 2])
-        # print('SHAMT =', shamt)
-        instR_dict['shamt'] = int_to_binarystring(shamt, 5)
-        # print('SHAMT em binário:', instR_dict['shamt'])
+            shamt = int(bitfield_list[i + 2])
+            # print('SHAMT =', shamt)
+            instR_dict['shamt'] = int_to_binarystring(shamt, 5)
+            # print('SHAMT em binário:', instR_dict['shamt'])
 
-        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
+            instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
 
-    # Caso especial do tipo R: instrução JR
-    elif instruction.name == "JR":
-        rd = bitfield_list[i]  # nome do registrador
-        register_d = register_set_dict[rd.lower()]  # objeto registrador
-        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+        # Caso especial do tipo R: instrução JR
+        elif instruction.name == "JR":
+            rd = bitfield_list[i]  # nome do registrador
+            register_d = register_set_dict[rd.lower()]  # objeto registrador
+            instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
 
-        instR_dict['rs'] = '00000'
-        instR_dict['rt'] = '00000'
-        instR_dict['shamt'] = '00000'
+            instR_dict['rs'] = '00000'
+            instR_dict['rt'] = '00000'
+            instR_dict['shamt'] = '00000'
 
-        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
+            instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
 
-    # Se não for um caso especial
+        # Se não for um caso especial
+        else:
+            rd = bitfield_list[i]
+            register_d = register_set_dict[rd.lower()]
+            # print('Registrador = ' + register_d.name)
+            instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
+            # print('Num do registrador em binário:', instR_dict['rd'])
+
+            rs = bitfield_list[i + 1]
+            register_s = register_set_dict[rs.lower()]
+            # print('Registrador = ' + register_s.name)
+            instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
+            # print('Num do registrador em binário:', instR_dict['rs'])
+
+            rt = bitfield_list[i + 2]
+            register_t = register_set_dict[rt.lower()]
+            # print('Registrador = ' + register_t.name)
+            instR_dict['rt'] = int_to_binarystring(register_t.num, 5)
+            # print('Num do registrador em binário:', instR_dict['rt'])
+
+            instR_dict['shamt'] = '00000'
+
+            instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
+
+        # Gerando comando em binário do tipo R final seguindo a ordem: opcode - rs - rt - rd - shamt - funct
+        command_bin = command_bin + ' ' + instR_dict['rs'] + ' ' + instR_dict['rt'] + ' ' + instR_dict['rd'] + ' ' + instR_dict['shamt'] + ' ' + instR_dict['funct']
+
+
+    # formatar command_bin para tipo I
+    elif instruction.type == 'I':
+        instI_dict = dict({
+            'rs': None,
+            'rt': None,
+            'offset': None
+        })
+
+        # Caso especial do tipo I: instruções BEQ e BNE
+        if instruction.name == 'BEQ' or instruction.name == 'BNE':
+            rs = bitfield_list[i]
+            register_s = register_set_dict[rs.lower()]
+            # print('Registrador = ' + register_s.name)
+            instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+            # print('Num do registrador em binário:', instI_dict['rs'])
+
+            rt = bitfield_list[i + 1]
+            register_t = register_set_dict[rt.lower()]
+            # print('Registrador = ' + register_t.name)
+            instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+            # print('Num do registrador em binário:', instI_dict['rt'])
+
+            flag = bitfield_list[i + 2]
+            offset = flags_in_file[flag]
+            instI_dict['offset'] = int_to_binarystring(offset, 16)
+
+        elif instruction.name == 'LW' or instruction.name == 'SW':
+            rt = bitfield_list[i]
+            register_t = register_set_dict[rt.lower()]
+            # print('Registrador = ' + register_t.name)
+            instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+            # print ('Num do registrador em binário:', instI_dict['rt'])
+
+            offset = int(bitfield_list[i + 1])
+            instI_dict['offset'] = int_to_binarystring(offset, 16)
+
+            rs = bitfield_list[i + 2]
+            register_s = register_set_dict[rs.lower()]
+            # print('Registrador = ' + register_s.name)
+            instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+            # ('Num do registrador em binário:', instI_dict['rs'])
+
+
+        else:
+            rs = bitfield_list[i]
+            register_s = register_set_dict[rs.lower()]
+            # print('Registrador = ' + register_s.name)
+            instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
+            # print('Num do registrador em binário:', instI_dict['rs'])
+
+            rt = bitfield_list[i + 1]
+            register_t = register_set_dict[rt.lower()]
+            # print('Registrador = ' + register_t.name)
+            instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
+            # print('Num do registrador em binário:', instI_dict['rt'])
+
+            offset = int(bitfield_list[i + 2])
+            instI_dict['offset'] = int_to_binarystring(offset, 16)
+
+        # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
+        command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
+
+
+    # formatar command_bin para tipo J
     else:
-        rd = bitfield_list[i]
-        register_d = register_set_dict[rd.lower()]
-        # print('Registrador = ' + register_d.name)
-        instR_dict['rd'] = int_to_binarystring(register_d.num, 5)
-        # print('Num do registrador em binário:', instR_dict['rd'])
+        instJ_dict = dict({
+            'address': None
+        })
 
-        rs = bitfield_list[i + 1]
-        register_s = register_set_dict[rs.lower()]
-        # print('Registrador = ' + register_s.name)
-        instR_dict['rs'] = int_to_binarystring(register_s.num, 5)
-        # print('Num do registrador em binário:', instR_dict['rs'])
+        flag = bitfield_list[i]
+        address = flags_in_file[flag]
+        instJ_dict['address'] = int_to_binarystring(address, 16)
 
-        rt = bitfield_list[i + 2]
-        register_t = register_set_dict[rt.lower()]
-        # print('Registrador = ' + register_t.name)
-        instR_dict['rt'] = int_to_binarystring(register_t.num, 5)
-        # print('Num do registrador em binário:', instR_dict['rt'])
-
-        instR_dict['shamt'] = '00000'
-
-        instR_dict['funct'] = int_to_binarystring(instruction.funct, 6)
-
-    # Gerando comando em binário do tipo R final seguindo a ordem: opcode - rs - rt - rd - shamt - funct
-    command_bin = command_bin + ' ' + instR_dict['rs'] + ' ' + instR_dict['rt'] + ' ' + instR_dict['rd'] + ' ' + instR_dict['shamt'] + ' ' + instR_dict['funct']
+        # Gerando comando em binário do tipo J final seguindo a ordem: opcode - address
+        command_bin = command_bin + ' ' + instJ_dict['address']
 
 
-# formatar command_bin para tipo I
-elif instruction.type == 'I':
-    instI_dict = dict({
-        'rs': None,
-        'rt': None,
-        'offset': None
-    })
-
-    # Caso especial do tipo I: instruções BEQ e BNE
-    if instruction.name == 'BEQ' or instruction.name == 'BNE':
-        rs = bitfield_list[i]
-        register_s = register_set_dict[rs.lower()]
-        print('Registrador = ' + register_s.name)
-        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
-        print('Num do registrador em binário:', instI_dict['rs'])
-
-        rt = bitfield_list[i + 1]
-        register_t = register_set_dict[rt.lower()]
-        print('Registrador = ' + register_t.name)
-        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
-        print('Num do registrador em binário:', instI_dict['rt'])
-
-        flag = bitfield_list[i + 2]
-        offset = flags_in_file[flag]
-        instI_dict['offset'] = int_to_binarystring(offset, 16)
-
-    elif instruction.name == 'LW' or instruction.name == 'SW':
-        rt = bitfield_list[i]
-        register_t = register_set_dict[rt.lower()]
-        print('Registrador = ' + register_t.name)
-        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
-        print('Num do registrador em binário:', instI_dict['rt'])
-
-        offset = int(bitfield_list[i + 1])
-        instI_dict['offset'] = int_to_binarystring(offset, 16)
-
-        rs = bitfield_list[i + 2]
-        register_s = register_set_dict[rs.lower()]
-        print('Registrador = ' + register_s.name)
-        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
-        print('Num do registrador em binário:', instI_dict['rs'])
-
-
-    else:
-        rs = bitfield_list[i]
-        register_s = register_set_dict[rs.lower()]
-        print('Registrador = ' + register_s.name)
-        instI_dict['rs'] = int_to_binarystring(register_s.num, 5)
-        print('Num do registrador em binário:', instI_dict['rs'])
-
-        rt = bitfield_list[i + 1]
-        register_t = register_set_dict[rt.lower()]
-        print('Registrador = ' + register_t.name)
-        instI_dict['rt'] = int_to_binarystring(register_t.num, 5)
-        print('Num do registrador em binário:', instI_dict['rt'])
-
-        offset = int(bitfield_list[i + 2])
-        instI_dict['offset'] = int_to_binarystring(offset, 16)
-
-    # Gerando comando em binário do tipo I final seguindo a ordem: opcode - rs - rt - offset
-    command_bin = command_bin + ' ' + instI_dict['rs'] + ' ' + instI_dict['rt'] + ' ' + instI_dict['offset']
-
-
-# formatar command_bin para tipo J
-else:
-    instJ_dict = dict({
-        'address': None
-    })
-
-    flag = bitfield_list[i]
-    address = flags_in_file[flag]
-    instJ_dict['address'] = int_to_binarystring(address, 16)
-
-    # Gerando comando em binário do tipo J final seguindo a ordem: opcode - address
-    command_bin = command_bin + ' ' + instJ_dict['address']
-
-
-print('comando binário final =', command_bin)
-
+    print('comando binário final =', command_bin)
 asm_file.close()
