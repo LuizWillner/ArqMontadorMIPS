@@ -1,4 +1,8 @@
 # ArqMontadorMIPS
+Trabalho da disciplina de Arquitetura de Computadores | Universidade Federal Fluminense | 2022.1
+
+## Objetivo
+Elaborar um programa que simule o processo de tradução de um arquivo assembly (MIPS) para código binário.
 
 ###
 ### Como utilizar o codificador
@@ -27,8 +31,7 @@ como base foi gerado baseado na tabela fornecida pela descrição do problema
 que especificada quais instruções deveriam ser codificadas
 
 #### Register.py
-Arquivo que contém a classe Registrador, seus atributos, métodos e algumas
-funções auxiliares
+Arquivo que contém a classe Registrador, seus atributos, métodos e algumas funções auxiliares
 
 ###
 ### Descrição de outros arquivos
