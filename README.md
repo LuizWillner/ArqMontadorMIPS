@@ -11,8 +11,8 @@ Elaborar um programa que simule o processo de tradução de um arquivo assembly 
 3) Escolha se deseja gerar como saída um arquivo binário ou um txt para visualizar o código em binário. 
 O nome desse arquivo será _saida.bin_ ou _saida.txt_
 
-###
-### Descrição dos scripts auxiliares
+##
+## Descrição dos scripts auxiliares
 
 #### InstructionSetGenerator.py
 O _InstructionSetGenerator.py_ gera um arquivo binário de nome padrão _instruction_set.bin_ com diversas instruções e suas
