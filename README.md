@@ -4,14 +4,12 @@ Trabalho da disciplina de Arquitetura de Computadores | Universidade Federal Flu
 ## Objetivo
 Elaborar um programa que simule o processo de tradução de um arquivo assembly (MIPS) para código binário.
 
-###
-### Como utilizar o codificador
+## Como utilizar o codificador
 1) Rode o _main.py_ para codificar em binário um arquivo .asm
 2) Insira o nome do arquivo Assembly a ser codificado SEM A EXTENSÃO
 3) Escolha se deseja gerar como saída um arquivo binário ou um txt para visualizar o código em binário. 
 O nome desse arquivo será _saida.bin_ ou _saida.txt_
 
-##
 ## Descrição dos scripts auxiliares
 
 #### InstructionSetGenerator.py
